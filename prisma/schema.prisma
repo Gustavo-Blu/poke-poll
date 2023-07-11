@@ -58,6 +58,15 @@ model User {
     sessions      Session[]
 }
 
+model Pokemon {
+    id       String   @id @default(cuid())
+    name     String
+    types    String[]
+    imageUrl String
+    likes    Int      @default(0)
+    dislikes Int      @default(0)
+}
+
 model VerificationToken {
     identifier String
     token      String   @unique
