@@ -1,33 +1,58 @@
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { render } from "react-dom";
 import { api } from "~/utils/api";
 
 const Pokemon = () => {
-  // const { data: pokemon, isLoading } = api.pokemon.getAll.useQuery();
+  const [rendered, setRendered] = useState(false);
 
-  const ctx = api.useContext();
+  const { data: pokemon, isLoading, isError } = api.pokemon.getAll.useQuery();
 
-  const { mutate, isLoading: pokeLoading } = api.pokemon.pokeCreate.useMutation(
-    {
-      onSuccess: () => {
-        void ctx.pokemon.getAll.invalidate();
-      },
-      onError: (e) => {
-        const errorMessage = e.data?.zodError?.fieldErrors.context;
+  useEffect(() => {
+    let timer = setTimeout(() => setRendered(true), 1000);
 
-        if (errorMessage && errorMessage[0]) {
-          console.error(errorMessage[0]);
-        } else {
-          console.error("Failed to add pokemon");
-        }
-      },
-    }
-  );
-
-  const uploadPokemon = () => {};
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
 
   return (
-    <main className=" min-h-screen w-screen bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
+    <main className="min-h-screen w-full bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
       <section>
-        <h1 className="text-center">All Pokemon</h1>
+        <h1
+          className={`text-center transition-all duration-1000 ${
+            !isLoading ? " text-blue-300" : " text-blue-900"
+          }`}
+        >
+          All Pokemon
+        </h1>
+        {isLoading && <div>Pokemon are loading</div>}
+        {isError && <div>Failed to get pokemon</div>}
+
+        <div className="flex flex-wrap justify-evenly gap-3 p-5">
+          {pokemon?.map((poke, index) => {
+            const duration = index * 1000;
+            // console.log(duration);
+            return (
+              <div
+                key={poke.name}
+                className={`flex flex-col items-center justify-center text-center transition-all duration-[${duration}ms] ease-in-out ${
+                  rendered
+                    ? " text-blue-300 opacity-100"
+                    : " text-blue-900 opacity-0"
+                }`}
+              >
+                <Image
+                  src={poke.imageUrl}
+                  alt={`${poke.name} official artwork`}
+                  width={80}
+                  height={80}
+                />
+                <p className="w-auto">{poke.name}</p>
+              </div>
+            );
+          })}
+        </div>
       </section>
     </main>
   );
