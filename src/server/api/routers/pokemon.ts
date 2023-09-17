@@ -15,7 +15,7 @@ export const pokemonRouter = createTRPCRouter({
       };
     }),
 
-  getOne: publicProcedure.input(z.string()).query(({ ctx, input }) => {
+  getOne: publicProcedure.input(z.number()).query(({ ctx, input }) => {
     return ctx.prisma.pokemon.findFirst({
       where: {
         id: input,
